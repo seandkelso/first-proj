@@ -1,0 +1,79 @@
+//simulates a wild fire, size N, P times
+function y = fire_sim(N,p)
+     figure(1);
+     %sets size of forest NxN
+     C = ones(N,N);
+     Z = zeros(N,N);
+     x = 1:N;
+     y = 1:N;
+     %Set initial fire
+     fires = [floor(N/2),floor(N/2)];
+     [numfires,temp] = size(fires);
+     for i = 1:numfires
+         C(fires(i,1),fires(i,2))=2;
+     end
+     %Simulate spread
+     maxsteps = 1000; %number of iterations to plot
+     k=0;
+     while k<maxsteps && numfires>0
+         lastC = C;
+         numfires_next = 0;
+         fires_next = [];
+         for i = 1:numfires
+             if fires(i,1)~=1
+                 if C(fires(i,1)-1,fires(i,2))==1
+                     r = rand(1);
+                     if r < p
+                         numfires_next = numfires_next + 1;
+                         C(fires(i,1)-1,fires(i,2))=2;
+                         fires_next(numfires_next,:)=[fires(i,1)-1,fires(i,2)];
+                     end
+                 end
+             end
+             if fires(i,1)~=N
+                 if C(fires(i,1)+1,fires(i,2))==1
+                     r = rand(1);
+                     if r < p
+                         numfires_next = numfires_next + 1;
+                         C(fires(i,1)+1,fires(i,2))=2;
+                         fires_next(numfires_next,:)=[fires(i,1)+1,fires(i,2)];
+                     end
+                 end
+             end
+             if fires(i,2)~=1
+                 if C(fires(i,1),fires(i,2)-1)==1
+                     r = rand(1);
+                     if r < p
+                         numfires_next = numfires_next + 1;
+                         C(fires(i,1),fires(i,2)-1)=2;
+                         fires_next(numfires_next,:)=[fires(i,1),fires(i,2)-1];
+                     end
+                 end
+             end
+             if fires(i,2)~=N
+                 if C(fires(i,1),fires(i,2)+1)==1
+                     r = rand(1);
+                     if r < p
+                         numfires_next = numfires_next + 1;
+                         C(fires(i,1),fires(i,2)+1)=2;
+                         fires_next(numfires_next,:)=[fires(i,1),fires(i,2)+1];
+                     end
+                 end
+             end
+             C(fires(i,1),fires(i,2))=0;
+         end
+         surf(x,y,C,C);
+         view(360,90);
+         colormap([0 0 0; 0 1 0; 1 0 0])
+         caxis([0 2]);
+         axis([1,length(x),1,length(y),0,2])
+         shading interp
+         title(sprintf('Step = %.0f',k))
+         drawnow;
+         k=k+1;
+         if sum(sum(abs(lastC-C)))==0
+              break
+         end
+         fires = fires_next;
+         numfires = numfires_next;
+     end
