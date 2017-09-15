@@ -1,0 +1,30 @@
+%encyrpt a file
+%asks user 
+
+inFile = 0;
+while inFile < 1
+   filename = input('Encryption file: ', 's');
+   [inFile, message] = fopen(filename, 'r');
+   if inFile == -1
+     disp(message)
+   end
+
+
+outputFileName = [filename 'crypt'];
+[outputFile, message] = fopen(outputFileName, 'w');
+
+key = input('Encryption Key: ');
+forward = input('Enter "true" for encrypt, "false" for decrypt: ');
+
+[inputString, num] = fread(inFile);
+if num > 0
+    result = crypt(inputString, key, forward);
+    fwrite(outputFile, result);
+end
+
+[base, num] = fread(inFile, 1, 'char');
+
+
+fclose(inFile);
+fclose(outputFile);
+end  
