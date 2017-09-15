@@ -1,0 +1,71 @@
+function plotConstellations(constellations, stars) 
+%generates a constellation image from: 1) a constellation structure input (.txt), and 2) a star data input (.txt).
+fid = fopen(constellations);
+stars = parseStarFile(stars);
+line = fgetl(fid); %initializes reading next line of file
+line = fgetl(fid); %reads next line of file
+segments = sscanf(line, '%d');
+plotStars('stars.txt');
+position = 1; %initializes position
+string = 'ymcrgb'; %colors yellow, magenta, cyan, red, green, and blue
+color = string(position);
+
+for i = 1 : length(stars) %iterates over entire set
+    for j = 1 : segments
+        line = fgetl(fid); %reads next line of file
+        points = sscanf(line, '%d');
+        firstLocation = find(stars(:, 4) == points(1));
+        xCoord1 = stars(firstLocation, 1);
+        yCoord1 = stars(firstLocation, 2);
+        nextLocation = find(stars(:, 4) == points(2));
+        xCoord2 = stars(nextLocation, 1);
+        yCoord2 = stars(nextLocation, 2);
+        xCoord = [xCoord1; xCoord2];
+        yCoord = [yCoord1; yCoord2];
+        plot(xCoord, yCoord, color); %plots constellation
+        hold on; %keeps first constellation, repeats for the rest
+    end
+
+    if feof(fid) %breaks if it finds the end of the file (feof)
+        break;
+    end
+    
+line = fgetl(fid); %reads next line of file
+line = fgetl(fid); %reads next line of file
+segments = sscanf(line, '%d');
+
+    if position == 6
+        position = 0; %resets
+    end
+
+position = position + 1; %advances along the constellations
+color = string(position); %colors each constellation separately
+end
+
+end
+
+function stars = parseStarFile(filename) %subfunction parseStarFile...this function reads the star data file and returns an appropriate matlab structure capable of being plotted
+    filename = load(filename);
+    xCoord = filename( 1: length(filename), 1); %horizontal position of the displayed star on a scale from -1 to +1
+    yCoord = filename(1 : length(filename), 2); %vertical position of the displayed star on a scale from -1 to +1
+    %Z-coordinate data is not used for this assignment
+    draperNum = filename(1 : length(filename), 4); %unqiue identification number, known as its Henry Draper number
+    magnitude = filename(1 : length(filename), 5); %floating-point number that descibes the apparent magnitude of a star
+    brightness = 15 * (10 .^ (magnitude ./ -2.512));
+    %Harvard Revised number is not used for this assignment
+    stars = [xCoord, yCoord, brightness, draperNum];
+end
+
+function plotStars(stars) %subfunction plotStars (the following code is adapted from website)...this function takes the data returned by parseStarFile and plot it on the current figure
+    stars = parseStarFile(stars);
+    clf;
+    hold off;              
+    axis equal;             
+    axis off;              
+    set(gcf, 'Color', 'k');   
+    hold on;
+    xCoord = stars(:, 1);
+    yCoord = stars(:, 2);
+    brightness = stars(:, 3);
+    scatter(xCoord, yCoord, brightness, 'w', 'filled')
+end
