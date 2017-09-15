@@ -1,0 +1,36 @@
+function [result] = ApproxPiTest(N)
+%this function approximates pi by throwing darts at the unit square
+%N = number of darts
+
+for i = 1:N
+    %1) pick a point (throw a dart) in unit square
+    [x y] = pickPoint();
+    %2) determine if point is in unit circle
+    inCircle = inUnitCircle(x, y);
+    %3) update count
+    if inCircle 
+        count = count + 1;
+    end
+end
+result = 4*(count/N);
+end
+
+
+function [x y] = pickPoint()
+%this function picks an x y point inside the unit square
+x = rand() *2 -1; %number between -1 and 1
+y = rand() *2 -1; %number between -1 and 1
+
+end
+
+function [result] = inUnitCircle(x, y)
+%this function determines whether point x,y is in the unit circle centered
+%at 0,0
+distOrigin = sqrt(x*x + y*y) %distance from origin
+if distOrigin <= 1
+    result = true;
+else 
+    result = false;
+end
+
+end
